@@ -20,26 +20,24 @@ Odsetek populacji mieszkającej w miastach: 58% (poniżej średniej)
 
 ```{r}
 arest <- USArrests
-
-stan <- "Wyoming" #tutaj wpisać pożądaną nazwę stanu dla raportu
-
-
-nazwa <- paste("Nazwa stanu: ", stan, sep = "")
-
-murder <- paste("Aresztowani w sprawie morderstw (na 100 000 mieszkańców): ", arest[stan,1], 
+for (i in 1:nrow(arest)){
+  
+  stan <- labels(arest)[[1]][i]
+  nazwa <- paste("Nazwa stanu: ", stan, sep = "")
+  
+  murder <- paste("Aresztowani w sprawie morderstw (na 100 000 mieszkańców): ", arest[stan,1], 
       if(arest[stan, 1] > mean(arest$Murder)) {" (powyżej średniej)"} else {"(poniżej średniej)"}, sep = "" )
 
-assault <- paste("Aresztowani w sprawie napadów (na 100 000 mieszkańców): ", arest[stan,2], 
+  assault <- paste("Aresztowani w sprawie napadów (na 100 000 mieszkańców): ", arest[stan,2], 
       if(arest[stan, 2] > mean(arest$Assault)) {" (powyżej średniej)"} else {"(poniżej średniej)"}, sep = "" )
 
-rape <- paste("Aresztowani w sprawie gwałtów (na 100 000 mieszkańców): ", arest[stan,3], 
+  rape <- paste("Aresztowani w sprawie gwałtów (na 100 000 mieszkańców): ", arest[stan,3], 
       if(arest[stan, 3] > mean(arest$Rape)) {" (powyżej średniej)"} else {"(poniżej średniej)"}, sep = "" )
 
-pop <- paste("Odsetek populacji mieszkającej w miastach: ", arest[stan,4],
+  pop <- paste("Odsetek populacji mieszkającej w miastach: ", arest[stan,4],
       if(arest[stan, 4] > mean(arest$UrbanPop)) {" (powyżej średniej)"} else {"(poniżej średniej)"}, sep = ""  )
 
-
-#test <- print(paste(nazwa, murder, assault, rape, pop, sep = "\n"))
-test <- cat(nazwa, murder, assault, rape, pop, sep = "\n")
-
+  test <- cat(nazwa, murder, assault, rape, pop, "", sep = "\n")
+  
+}
 ```
