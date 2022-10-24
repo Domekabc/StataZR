@@ -3,7 +3,7 @@ title: "Praca domowa - struktury kontrolne"
 author: "Bartosz Maćkiewicz"
 output: html_document
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 # Zadanie do notebooka "Konstrukcje warunkowe"
@@ -21,7 +21,7 @@ Odsetek populacji mieszkającej w miastach: 58% (poniżej średniej)
 ```{r}
 arest <- USArrests
 
-stan <- "Alaska" #tutaj wpisać pożądaną nazwę stanu dla raportu
+stan <- "Wyoming" #tutaj wpisać pożądaną nazwę stanu dla raportu
 
 
 nazwa <- paste("Nazwa stanu: ", stan, sep = "")
@@ -39,8 +39,7 @@ pop <- paste("Odsetek populacji mieszkającej w miastach: ", arest[stan,4],
       if(arest[stan, 4] > mean(arest$UrbanPop)) {" (powyżej średniej)"} else {"(poniżej średniej)"}, sep = ""  )
 
 
-test <- print(paste(nazwa, murder, assault, rape, pop, collapse = "\n", sep = ""))
-
-print("testestest \n testes")
+#test <- print(paste(nazwa, murder, assault, rape, pop, sep = "\n"))
+test <- cat(nazwa, murder, assault, rape, pop, sep = "\n")
 
 ```
