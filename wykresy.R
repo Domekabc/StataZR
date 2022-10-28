@@ -1,5 +1,4 @@
 # lab 28.10.2022
-library(png)
 
 b1 <- beaver1[beaver1$day == 346,]
 b2 <- beaver2[beaver2$day == 307,]
