@@ -28,9 +28,6 @@ plec <- c("K","M","K","K","K","M")
 ##ifelse(warunek, jeślitak, jeślinie)
 
 
-getwd()
-setwd("C://Users//Dominik//Desktop//Dominik//Studia//R")
-
 imods <- read.csv("Dane//imodyfikatory.csv")
 
 
