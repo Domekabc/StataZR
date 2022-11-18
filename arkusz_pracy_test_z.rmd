@@ -1,0 +1,120 @@
+---
+title: 'Arkusz pracy na zajęciach: test z'
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+# Zadanie 1
+
+Dyrektor pewnej szkoły twierdzi, że uczniowie w jego szkole cechują się ponadprzeciętną inteligencją.
+
+Średnie IQ w losowej próbie 30 uczniów tej szkoły  wynosiło 112.5. Czy dysponujemy wystarczającymi świadectwami za twierdzeniem dyrektora?
+
+Skądinąd wiemy, że w populacji średnie IQ wynosi 100 z odchyleniem standardowym 15.
+
+```{r}
+sdc <- 15 / sqrt(30)
+
+obszarKrytyczny <- qnorm(0.95, 100, sdc)
+z_stat <- (112.5 - 100) / sdc
+
+
+```
+
+*Tak, dysponujemy wystarczającymi świadectwami za twierdzeniem dyrektora*
+
+
+# Zadanie 2
+
+Jak wspomnieliśmy, w populacji średnie IQ wynosi 100 z odchyleniem standardowym 15.
+
+Ustal za pomocą R, przy jakiej średniej z próby odrzucimy hipotezę zerową $H_0: \mu = 100$:
+
+a) Dla próby o liczebności 50, dla testu jednostronnego przy poziomie istotności statystycznej $\alpha = 0.05$
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+b) Dla próby o liczebności 50, dla testu dwustronnego przy poziomie istotności statystycznej $\alpha = 0.05$
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+c) Dla próby o liczebności 100, dla testu jednostronnego przy poziomie istotności statystycznej $\alpha = 0.05$
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+d) Dla próby o liczebności 100, dla testu dwustronnego przy poziomie istotności statystycznej $\alpha = 0.05$
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+e) Dla próby o liczebności 50, dla testu jednostronnego przy poziomie istotności statystycznej $\alpha = 0.01$
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+f) Dla próby o liczebności 50, dla testu dwustronnego przy poziomie istotności statystycznej $\alpha = 0.01$
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+g) Dla próby o liczebności 100, dla testu jednostronnego przy poziomie istotności statystycznej $\alpha = 0.01$
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+h) Dla próby o liczebności 100, dla testu dwustronnego przy poziomie istotności statystycznej $\alpha = 0.01$
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+Jakie wnioski wyciągniesz z tych eksperymentów? 
+
+*Tutaj miejsce na Twoją odpowiedź*
+
+
+# Zadanie 3 
+
+Założmy, że w pewnym regionie geograficznym średnia i odchylenie standardowe testu czytania ze zrozumieniem wynoszą $100$ i $12$ punktów. My zajmiemy się wynikami $55$ uczniów pewnej szkoły. Dane znajdują się w wyniku `reading_fake_data.csv`. 
+
+## Podzadanie A 
+
+Proszę obliczyć podstawowe statystyki deskryptywne dla danych dotyczących uczniów - średnia, odchylenie standardowe, mediana.
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+## Podzadanie B
+
+Przygotuj wykres pudełkowy dla tego zbioru danych i zinterpretuj go.
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+## Podzadanie C
+
+Możemy rozsądnie spytać, czy wynik ten jest istotnie niższy niż średnia w regionie, czy raczej rozsądniej jest przyjąć, że nieco niższa średnia niż średnia w populacji jest dziełem przypadku.
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+# Zadanie 4
+
+Napisz funkcję, która generuje fałszywe dane z wynikami testu czytania ze zrozumieniem. Załóż, że funkcja musi generować realistyczne dane o zadanej średniej i odchyleniu standardowym (powiedzmy z precyzją do 1%). Zastanów się, co musi robić funkcja oprócz losowania liczb.
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
