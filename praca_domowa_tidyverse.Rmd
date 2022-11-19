@@ -1,0 +1,96 @@
+---
+title: "Praca domowa - tidyverse"
+author: "Bartosz Maćkiewicz"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Zadanie I
+
+Proszę za pomocą poznanych funkcji z pakietu `dplyr` stworzyć, korzystając z danych ze zbioru `airquality`, następującą tabelę:
+
+```{r}
+library(tidyverse)
+library(knitr)
+
+qual <- airquality
+qual <- mutate(qual, owr = Ozone / Wind)
+qual_new <- group_by(qual, Month) %>%
+  summarise(n_obs = max(na.rm = T, Day),
+            mean_temp = mean(Temp, na.rm = T),
+            sd_temp = sd(Temp, na.rm = T),
+            min_temp = min(Temp, na.rm = T),
+            max_temp = max(Temp, na.rm = T),
+            mean_owr = mean(owr, na.rm = T),
+            sd_owr = sd(owr, na.rm = T),
+            min_owr = min(owr, na.rm = T),
+            max_owr = max(owr, na.rm = T)
+            ) %>%
+  arrange(desc(mean_owr))
+
+kable(qual_new, digits = 3)
+```
+
+1. Kolumny zaczynające się od `mean_`, `sd_`, `min_` i `max_` to średnia, odchylenie standardowe, największa i najmniejsza obserwacja z każdego miesiąca dla poszczególnych kolumn. 
+
+2. `owr` dotyczy nowej kolumny, którą muszą Państwo stworzyć - jest to `OzoneToWindRatio` czyli po prostu wartość z kolumny `Ozone` podzielona przez wartość z kolumny `Wind`. 
+
+3. `n_obs` to liczba obserwacji w danym miesiącu.
+
+4. Wiersze w wynikowej ramce danych powinny być posortowane według kolumny `mean_owr` w porządku malejącym. Wartości powinny być zaokrąglone do trzech miejsc po przecinku.
+
+5. Do stworzenia pięknego wydruku można użyć funkcji `kable` z pakietu `knitr` lub odpowiednich funkcji z pakietów `pander` bądź `flextable`.
+
+# Zadanie II
+
+Proszę za pomocą poznanych funkcji z pakietu `dplyr` stworzyć korzystając z danych ze zbioru `ChickWeight` następującą tabelę:
+
+```{r}
+data <- ChickWeight
+wykres <- group_by(data, Chick) %>%
+  group_by(Diet, .add = T) %>%
+  summarise(min_weight = min(weight),
+            max_weight = max(weight),
+            diff = max_weight - min_weight,
+            )
+tabelka <- group_by(wykres, Diet) %>%
+  summarise(mean_diff = mean(diff),
+            sd_diff = sd(diff),
+            n_chick = n()
+            )
+kable(tabelka)
+```
+
+1. `Diet` do jedna z czterech diet
+
+2. `mean_diff` to średnia z różnic między najwyższą i najniższą wagą każdego kurczaka dla danej diety
+
+3. `sd_diff` to odchylenie standardowe różnic między najwyższa i najniższą wagą każdego kurczaka dla danej diety
+
+4. `n_chick` to liczba kurczaków karmionych według danej diety.
+
+5. Do stworzenia pięknego wydruku można użyć funkcji `kable` z pakietu `knitr`.
+
+6. Aby stworzyć taką ramkę danych trzeba użyć `group_by` oraz `summarize` w naszym "łańcuchu" funkcji `dplyr` dwukrotnie - raz, żeby obliczyć odpowiednie rzeczy dla każdego kurczaka, drugi raz, żeby obliczyć dla każdej diety. Proszę nad tym pogłówkować!
+
+# Zadanie III
+  
+Proszę stworzyć następujący wykres obrazujący rozkład różnic między najwyższą a najniższą wagą każdego kurczaka ze względu na dietę.
+
+```{r}
+library(vioplot)
+vioplot(diff ~ Diet,
+        data = wykres, 
+        col = c("blue", "red", "green", "purple"),
+        ylab = "Różnica w gramach",
+        xlab = "Typ diety",
+        main = "Rozkład różnic pomiędzy największą a najmniejszą wagą"
+        )
+```
+
+1. Do wykonania tego wykresu należy posłużyć się funkcją `vioplot` z pakietu `vioplot`.
+
+2. Ramka danych, na podstawie której można stworzyć taki wykres, jest krokiem pośrednim w poprzednim zadaniu!
+
+3. Kolory należy dobrać samodzielnie, również podpisy można zmodyfikować.
