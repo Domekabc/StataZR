@@ -1,0 +1,152 @@
+---
+title: "Praca domowa - rozkłady teoretyczne i symulacje"
+author: "Bartosz Maćkiewicz"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+# Zadanie 1
+
+Rozważmy dziesięciokrotny rzut symetryczną monetą. Jakie jest prawdopodobieństwo wyrzucenia (proszę obliczyć za pomocą funkcji umożliwiających korzystanie z rozkładów teoretycznych oraz za pomocą odpowiedniej symulacji):
+
+* co najwyżej 4 orłów (**prawidłowa odpowiedź: 0.3769...**),
+
+```{r}
+pbinom(4, 10, 0.5)
+
+#może nie idealna, ale ta metoda zadziała na zasadzie symulacji
+test <- rbinom(100000, 10, 0.5)
+hist(test)
+test2 <- test[test < 5]
+length(test2) / length(test)
+
+```
+
+
+* mniej niż 4 orłów (**prawidłowa odpowiedź: 0.1718...**),
+
+```{r}
+pbinom(3, 10, 0.5)
+test <- rbinom(100000, 10, 0.5)
+hist(test)
+test2 <- test[test < 4]
+length(test2) / length(test)
+```
+
+* więcej niż 4 orłów (**prawidłowa odpowiedź: 0.6230...**),
+
+```{r}
+pbinom(4, 10, 0.5)
+test <- rbinom(100000, 10, 0.5)
+hist(test)
+test2 <- test[test > 5]
+1 - (length(test2) / length(test))
+```
+
+* pomiędzy 4 a 7 orłów (**prawidłowa odpowiedź: 0.7734...**).
+
+```{r}
+pbinom(7, 10, 0.5) - pbinom(3, 10, 0.5)
+test <- rbinom(100000, 10, 0.5)
+hist(test)
+test2 <- test[test < 8]
+test3 <- test[test < 4]
+length(test2) / length(test) - length(test3) / length(test)
+```
+
+# Zadanie 2
+
+Pewnym testem zbadano 500 11-latków i 800 14-latków. W grupie młodszych dzieci średni wynik wyniósł 48, a odchylenie standardowe --- 8, natomiast w grupie starszych dzieci te liczby wynosiły odpowiednio 56 i 12. Przy założeniu rozkładu normalnego oszacuj, (a) ile 14-latków osiągnęło wyniki gorsze od średniej 11-latków, (**odpowiedź:** $\approx 202$); (b) ile 11-latków osiągnęło wyniki lepsze niż średnia 14-latków (**odpowiedź:** $\approx 79$).
+
+Proszę rozwiązać to zadanie za pomocą `pnorm` oraz zasymulować.
+
+```{r}
+młodsi <- replicate(10000, rnorm(500, 48, 8))
+starsi <- replicate(10000, rnorm(800, 56, 12))
+młodsi_m <- mean(młodsi)
+młodsi_s <- sd(młodsi)
+starsi_m <- mean(starsi)
+starsi_s <- sd(starsi)
+
+par(mfrow = c(1,2))
+hist(młodsi)
+hist(starsi)
+
+#starsi o wyniku gorszym od średniej młodszych
+pnorm(48, 56, 12) * 800
+
+#młodsi o wyniku lepszym od średniej starszych
+pnorm(56, 48, 8, lower.tail = F) * 500
+
+```
+
+
+
+# Zadanie 3
+
+Napisz funkcję (przeprowadzającą symulację), która jako wynik zwraca histogram sumy wyników uzyskanych w rzucie trzema kostkami jednocześnie. Funkcja ma mieć następującą postać:
+
+`hist_trzech_rzutow(liczba_scian, liczba_replikacji)`
+
+Argument `liczba_scian` ma przyjmować wartość domyślną 6, argument `liczba_replikacji 1000`.
+
+Po przekazaniu funkcji liczby ścian mniejszej niż 3 (zakładamy, że istnieją porządne 3-ścienne kostki) ma dodatkowo drukować na ekranie napis "UWAGA TO NIE KOSTKA" (ale wciąż rysować prawidłowy histogram!), przy wartości 1 ma zwracać wartość NA (i nic nie rysować).
+
+Dla chętnych - sprawdzić w internecie jak się obsługuje ostrzeżenia i błędy w R i spróbować zaimplementować tę wiedzę.
+
+```{r}
+library(tidyverse)
+hist_trzech_rzutów <- function(liczba_ścian = 6, liczba_replikacji = 1000){
+  if(liczba_ścian == 2) warning("UWAGA TO NIE KOSTKA")
+  if(liczba_ścian <= 1) return(NA)
+  dane <- replicate(liczba_replikacji, sample(liczba_ścian, 3, replace = T))
+  return(hist(colSums(dane), main = "Sumy oczek z trzech rzutów", xlab = "Suma oczek", ylab = "Liczba wystąpień"))
+}
+hist_trzech_rzutów()
+```
+
+# Zadanie 4
+
+Wykonaj 3 symulacje losując z rozkładu normalnego 10, 35 i 100 liczb.
+
+Wykonaj wykres składający się z trzech paneli, na którym za pomocą histogramu przedstawisz rozkład próbki. 
+
+Na każdy panel nałóż dodatkowo krzywą ilustrującą rozkład rozkład populacji, z której losowałaś za pomocą funkcji `curve`. 
+
+```{r}
+sym1 <- rnorm(10)
+sym2 <- rnorm(35)
+sym3 <- rnorm(100)
+par(mfrow = c(2,2))
+hist(sym1, freq = F)
+curve(dnorm, add = T)
+
+hist(sym2, freq = F)
+curve(dnorm, add = T)
+
+
+hist(sym3, freq = F, ylim = c(0, 0.5))
+curve(dnorm, add = T)
+
+```
+
+# Zadanie 5 
+
+Wylicz za pomocą symulacji prawdopodobieństwo, że co najmniej dwie osoby z grupy 23 osób maja urodziny tego samego dnia. Przyjmij, że prawdopodobieństwo urodzenia się każdego dnia jest takie samo, a rok ma 365 dni (**odpowiedź:** $\approx 50%$).
+
+Proszę o **nieużywanie** funkcji `pbirthday`! 
+
+Tutaj nie chcemy obliczać dokładnego prawdopodobieństwa, a raczej przybliżyć to prawdopodobieństwo wykonując eksperyment symulacyjny.
+
+```{r}
+dane <- replicate(100000, sample(365, 23, replace = T))
+czyZduplikowane <- apply(dane, 2, anyDuplicated)
+nieZduplikowane <- czyZduplikowane[czyZduplikowane != 0]
+length(nieZduplikowane) / length(czyZduplikowane)
+
+```
