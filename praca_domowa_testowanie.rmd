@@ -1,0 +1,91 @@
+---
+title: "Praca domowa - podstawy testowania hipotez"
+author: "Bartosz Maćkiewicz"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, echo=FALSE)
+```
+
+# Zadanie 1
+
+Wyobraźmy sobie, że, że wymyśliliśmy sprawdzian ze statystyki. Na podstawie obserwacji z poprzednich lat sądzimy, że sprawdzian ten w pierwszym terminie zalicza 60% wszystkich studentek i studentów.  Mamy podejrzenie, że w tym roku studenci osiągają lepsze wyniki w nauce, ponieważ z powodu skończenia się epidemii COVID-19 mają więcej czasu na przygotowywanie się do sprawdzianów. W tym roku w pierwszym terminie zaliczyło go 33 studentów z 45 wszystkich testowanych. Czy rezultat ten upoważnia nas do przyjęcia naszej hipotezy?
+
+1. Napisz jak wygląda Twoim zdaniem hipoteza zerowa i hipoteza alternatywna.
+
+*H0: μ = 0.6 x 45 = 27*
+*HA: μ > 27*
+
+2. Przetestuj hipotezę korzystając z rozkładu dwumianowego. Wykonaj to ćwiczenie w dwóch wersjach - zakładając, że chodzi nam o test dwustronny i jednostronny. Wykonaj to ćwiczenie używając dystrybuanty rozkładu dwumianowego i wbudowej funkcji `binom.test`. 
+
+**Test dwumianowy jednostronny**
+
+```{r}
+pbinom(32, 45, 0.6, lower.tail = F)
+binom.test(33, 45, p = 0.6, alternative = "greater") #w obu przypadkach p = 0,04463 < 0,05, zatem odrzucamy H0
+```
+
+**Test dwumianowy dwustronny**
+
+```{r}
+binom.test(33, 45, p = 0.6, alternative = "two.sided") #p-value > 0,05 zatem przyjmujemy H0
+pbinom(32, 45, 0.6, lower.tail = F) #0,04463 > 0,025 - przy teście dwustronnym przyjmujemy H0
+```
+
+3. Czy w zależności od kierunkowości testu konluzja jest różna? Wyjaśnij własnymi słowami jaką różnicę robi kierunkowość hipotezy alternatywnej.
+
+*Takm konkluzja jest różna w zależności od kierunkowości testu. Przy teście dwustronnym obszar krytyczny jest podzielony na pół (w pewnym uproszczeniu) - po jednej połowie z każdej strony. Zatem trudniej osiągnąć wynik, który w obszarze krytycznym się znajduje przy hipotezie tak wyraźnie kierunkowej, jak w tym zadaniu.*
+
+# Zadanie 3
+
+Załóż, że "prawdziwe" prawdopodobieństwo zaliczenia egzaminu ze statystyki wynosi 60%, a chcemy sprawdzić prawdziwość hipotezy alternatywnej głoszącej, że prawdopodobieństwo to wynosi mniej niż 75% ($h_0(p=0.75)$). Jak często popelnimy błąd typu II przy próbie o liczebności 30, 100, 1000 obserwacji, przyjmując jednocześnie poziom istotności $\alpha = 0.05$? Jeżeli masz problem z konceptualizacją tego zadania, zajrzyj do podręcznika Howella i spójrz na wykresy - dzięki nim zrozumiesz, który obszar Cie interesuje. Można w ramach ściągawki użyć następującej prezentacji: http://www.stat.wisc.edu/~st571-1/10-power-4.pdf
+
+* $n = 30$
+
+```{r}
+
+```
+
+* $n = 100$
+
+```{r}
+# To jest miejsce na Twój kod
+```
+ 
+* $n = 1000$
+
+```{r}
+# To jest miejsce na Twój kod
+```
+ 
+# Zadanie 4
+
+Napisz funkcję wykonującą test $z$ o następującej specyfikacji:
+
+`z.test(mean, μ, σ, n, alternative, α)`
+
+która zwraca wartość o następującej specyfikacji:
+
+`list(p.value = *wartoscp*, z.stat = *wartoscz*, alternative = *kierunkowosc*, reject = *czyodrzucamy*)`
+
+`mean` - średnia z próby 
+`n` - liczebność próby
+`μ` - średnia z populacji
+`σ` - odchylenie standardowe z populacji
+`alternative` - kierunkowość hipotezy, domyślnie `two.sided` inne dopuszczalne możliwości to `greater` oraz `less`. Przy nieprawdiłowych wartościac ma zwracać `NA`.
+`α` - poziom istotności statystycznej
+
+```{r}
+# <- function(mean, μ, σ, n, factor(levels = c("less", "greater", "two.sided")) = "two.sided")
+
+#tu pytanie o parametr funkcji typu factor
+
+
+```
+
+```{r echo=TRUE}
+#z.test(55.71, 50, 10, 166, 'two.sided') # a tu można wykonać sobie testy
+```
