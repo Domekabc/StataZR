@@ -79,13 +79,27 @@ która zwraca wartość o następującej specyfikacji:
 `α` - poziom istotności statystycznej
 
 ```{r}
-# <- function(mean, μ, σ, n, factor(levels = c("less", "greater", "two.sided")) = "two.sided")
-
+alternative <- factor(levels = c("less", "greater", "two.sided"))
+z.test <- function(mean, μ, σ, n,  alternative = "two.sided", α = 0.05){
+  sdZPróby <- σ / sqrt(n)
+  z.stat <- (mean - μ) / sdZPróby
+  if(alternative == "less") p.value <- pnorm(z.stat)
+  else if(alternative == "greater") p.value <- pnorm(z.stat, lower.tail = F)
+  else {
+    left <- pnorm(z.stat)
+    right <- pnorm(z.stat, lower.tail = F)
+    p.value <- 2 * min(left, right)
+  }
+  reject <- p.value < α
+  lista <- list(p.value, z.stat, alternative, reject)
+  names(lista) <- c("p.value", "z.stat", "alternative", "reject")
+  return(lista)
+}
 #tu pytanie o parametr funkcji typu factor
-
-
+?pnorm
 ```
 
 ```{r echo=TRUE}
-#z.test(55.71, 50, 10, 166, 'two.sided') # a tu można wykonać sobie testy
+wynik <- z.test(81.2, 76.6, 8.3, 36, 'two.sided') # a tu można wykonać sobie testy
+wynik
 ```

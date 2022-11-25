@@ -1,0 +1,160 @@
+---
+title: "Praca domowa - testy chi-kwadrat"
+author: "Bartosz Maćkiewicz"
+output: html_document
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, echo=FALSE, warnings = FALSE)
+```
+
+# Zadanie 1
+
+Wykonano badania dotyczące populacji ryb występujących w pewnej okolicy. Notowano liczbę papugoryb (53), graników (22) oraz pokolców (49). Wcześniejsze badania wykazały, że populacje te występowały w stosunku 5:3:4. Czy obecny stan różni się istotnie od wcześniej zaobserwowanego? 
+
+Zadanie wykonujemy na dwa sposoby - samodzielnie licząc i korzystając z wbudowanej funkcji. Zadanie to wymaga zajrzenia do dokumentacji funkcji `chisq.test`. Napisz statystyczne podsumowanie wyników badania.
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+*Tu miejsce na Twoją odpowiedź*
+
+# Zadanie 2
+
+W doświadczeniu polegającym na krzyżowaniu dwóch gatunków ryb, z których jeden charakteryzuje się dobrym smakiem, ale niedużą wagą, natomiast drugi dużą wagą, ale nieco gorszym smakiem uzyskano wyniki:
+
+            Smaczne   Niesmaczne     
+-------     ------    ----------   
+**Duże**     315       101        
+**Małe**     108       32       
+
+Według teoretycznych rozważań genetyków, prawdopodobieństwo wystąpienia wymienionych rodzajów powinno wynosić 9:3:3:1. Na poziomie istotnosci 5% zweryfikuj hipotezę, że eksperyment potwierdził rozważania teoretyczne. Tak jak poprzednio wykonaj zadanie na dwa sposoby. Napisz statystyczne podsumowanie wyników badania.
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+   
+*Tu miejsce na Twoją odpowiedź*
+
+# Zadanie 3
+
+Na podstawie poniższych danych chcemy odpowiedzieć na pytanie, czy występowanie problemów z metabolizmem jest związane z płcią.
+
+                Problem wystąpił  Problem nie wystąpił     
+-------         ------            ----------   
+**Mężczyźni**   22                33        
+**Kobiety**     31                20       
+
+1. Używając najodpowiedniejszego testu, na poziomie istotności $\alpha = 0.05$ oceń, czy zależność występuje. Rozwiąż ten problem na dwa sposoby - używając funkcji wbudowanej w R przeprowadzającej ten test oraz odpowiedniego rozkładu teoretycznego. Napisz statystyczne podsumowanie wyników badania.
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+*Tu miejsce na Twoją odpowiedź*
+
+2. Jak możesz zauwazyć istnieje różnica między wynikami zwracanymi przez wbudowaną funkcję i tymi, które uzyskałeś za pomocą własnych obliczeń. 
+
+Związane jest to z faktem, że do tabel 2x2 funkcja wbudowana w R automatycznie stosuje poprawkę Yatesa na ciągłość. Korzystając z dostępnych Ci źródeł napisz, dlaczego poprawka ta jest używana i zaimplementuj ją sam. Napisz również polecenie, który wyłączy wprowadzanie poprawki w funkcji `chisq.test`.
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+
+3. Wykonaj wykres ilustrujący uzyskane w eksperymencie wyniki. Możesz użyć do tego funkcji rysujących wykresy z pakietu `vcd`, ale można również samemu poszukać odpowiednich funkcji i bibliotek w internecie.
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+# Zadanie 4
+
+W pakiecie `pwr` znajdują się bardzo przydatne funkcje do pracy z mocą testu. Dzisiaj zajmiemy sie funkcją `pwr.chisq.test`, służącą do obliczania mocy testu $\chi^2$. 
+
+Aby obliczyć moc testu $\chi^2i$ musimy znać wielkość efektu (*effect size*). Oblicza się ją w następujący sposób:
+
+$$
+\phi  = \frac{ad-bc}{\sqrt{efgh}}
+$$
+
+zakładając, że nasza tabela kontyngencji ma następującą postać:
+
+               X+               X-    Total     
+-------        ---              ---   ------
+**Y+**         a                b     e   
+**Y-**         c                d     f  
+Total          g                h     n
+
+Inna metoda obliczania to:
+
+$$
+\phi = \sqrt{\frac{\chi^2}{n}}
+$$
+Spróbujmy więc obliczyć moc naszego testu przy założeniu, że prawdziwa siła efektu wynosi 0.2 a liczebność naszej próby 100.
+
+```{r, echo = TRUE}
+library(pwr)
+pwr.chisq.test(w=0.2, N = 100, df = 1)
+pchisq(qchisq(0.95, 1), df = 1, ncp = (0.2**2) * 100, lower.tail = FALSE)
+```
+
+Trudno uzmysłowić sobie co miałaby reprezentować liczba 0.2. Możemy skorzystać z którejś z tabelek dostępnych w internecie, na przykład:
+
+http://imaging.mrc-cbu.cam.ac.uk/statswiki/FAQ/effectSize
+
+(należy pamiętać, że to jest sensowna interpretacja $\phi$ tylko dla tabel 2x2!)
+
+Spróbujmy przeprowadzić eksperyment. Załóżmy że prawdziwe prawdopodobieństwa bycia w poszczególnych kategoriach w tabeli 2x2 wynoszą:
+
+               X+               X-       
+-------        ---              --- 
+**Y+**         0.6              0.2      
+**Y-**         0.1              0.1    
+
+Łatwo zauważyć, że zmienne te nie są od siebie niezależne.
+
+```{r}
+m <- matrix(c(0.6,0.1,0.2,0.1), 2,2)
+m
+print('Phi')
+ES.w2(m)
+```
+
+Wykonajmy eksperyment, w którym losujemy 10 000 razy próbę o liczebności 100 z takiego rozkładu. Zobaczmy jak czesto uda nam się odrzucić hipotezę zerową. (nie przejmujemy się warningami)
+
+```{r, warning= FALSE}
+sim <- replicate(10000,{
+          sampl = sample.int(4, 100, replace = TRUE, prob = m)
+          m_s = matrix(table(sampl),2,2)
+          (chisq.test(m_s, correct = FALSE)$p.value)
+})
+
+print('Moc')
+moc <- length(sim[sim <= 0.05])/length(sim)
+moc
+
+print('Beta-błąd')
+1-moc
+```
+
+Moc testu statystycznego czyli $1-\beta$ możemy obliczyć przy pomocy funkcji `pwr.chisq.test`, która daje nam wynik porównywalny z przeprowadzoną wcześniej symulacją.
+
+```{r}
+pwr.chisq.test(w=ES.w2(m), N = 100, df = 1)
+pchisq(qchisq(0.95, 1), df = 1, ncp = (ES.w2(m)**2) * 100, lower.tail = FALSE)
+```
+
+Jak licznej potrzebujemy próby, by replikując eksperyment z zadania 3 moc naszego testu była większa niż 90% (tzn. $\beta < 0.1$) przy założeniu, że prawdziwa wielkosć efektu jest taka, jaką odkryli badacze? Zadanie to wymaga zajrzenia do dokumentacji `pwr.chisq.test` i pomyślenia. Proszę zwrócić uwagę, że potrzebują Państwo najpierw obliczyć wartości $\phi$ dla tego eksperymentu i właśnie tej liczby użyć w `pwr.chisq.test`. 
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+
+# Zadanie 5
+
+Dlaczego w testach $\chi^2$ obszar odrzucenia jest *zawsze* zlokalizowany w górnej części rozkładu?
+
+**Tutaj miejsce na Twoją odpowiedź**
