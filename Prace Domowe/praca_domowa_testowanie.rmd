@@ -37,7 +37,7 @@ pbinom(32, 45, 0.6, lower.tail = F) #0,04463 > 0,025 - przy teście dwustronnym 
 
 3. Czy w zależności od kierunkowości testu konluzja jest różna? Wyjaśnij własnymi słowami jaką różnicę robi kierunkowość hipotezy alternatywnej.
 
-*Takm konkluzja jest różna w zależności od kierunkowości testu. Przy teście dwustronnym obszar krytyczny jest podzielony na pół (w pewnym uproszczeniu) - po jednej połowie z każdej strony. Zatem trudniej osiągnąć wynik, który w obszarze krytycznym się znajduje przy hipotezie tak wyraźnie kierunkowej, jak w tym zadaniu.*
+*Tak, konkluzja jest różna w zależności od kierunkowości testu. Przy teście dwustronnym obszar krytyczny jest podzielony na pół (w pewnym uproszczeniu) - po jednej połowie z każdej strony. Zatem trudniej osiągnąć wynik, który w obszarze krytycznym się znajduje przy hipotezie tak wyraźnie kierunkowej, jak w tym zadaniu.*
 
 # Zadanie 3
 
@@ -46,19 +46,31 @@ Załóż, że "prawdziwe" prawdopodobieństwo zaliczenia egzaminu ze statystyki 
 * $n = 30$
 
 ```{r}
-
+qbinom(0.05, 30, 0.75)
+binom.test(18, 30, p = 0.75, alternative = "less")  #p > 0.05
+binom.test(17, 30, p = 0.75, alternative = "less")  #p < 0.05 zatem wszelkie próby o 17 lub mniej zdających doprowadziłyby do odrzucenia H0
+test <- sum(rbinom(100000, 30, 0.6) >= 18) / 100000
+#przy próbie o liczebności 30 błąd drugiego rodzaju popełnimy w ok 57,6% przypadków
 ```
 
 * $n = 100$
 
 ```{r}
-# To jest miejsce na Twój kod
+qbinom(0.05, 100, 0.75)
+binom.test(68, 100, p = 0.75, alternative = "less")  #p > 0.05
+binom.test(67, 100, p = 0.75, alternative = "less")  #p < 0.05 zatem wszelkie próby o 67 lub mniej zdających doprowadziłyby do odrzucenia H0
+test <- sum(rbinom(100000, 100, 0.6) >= 68) / 100000
+#przy próbie o liczebności 100 błąd drugiego rodzaju popełnimy w ok 6,26% przypadków
 ```
  
 * $n = 1000$
 
 ```{r}
-# To jest miejsce na Twój kod
+qbinom(0.05, 1000, 0.75)
+binom.test(727, 1000, p = 0.75, alternative = "less")  #p > 0.05
+binom.test(726, 1000, p = 0.75, alternative = "less")  #p < 0.05 zatem wszelkie próby o 726 lub mniej zdających doprowadziłyby do odrzucenia H0
+test <- sum(replicate(1000, sum(rbinom(100000, 1000, 0.6) >= 727) / 100000))
+#przy próbie o liczebności 1000 błąd drugiego rodzaju popełnimy w ~0% przypadków (szanse na błąd drugiego rodzaju są niezerowe, ale na tyle bliskie 0, że pomijalne)
 ```
  
 # Zadanie 4
@@ -79,8 +91,8 @@ która zwraca wartość o następującej specyfikacji:
 `α` - poziom istotności statystycznej
 
 ```{r}
-alternative <- factor(levels = c("less", "greater", "two.sided"))
 z.test <- function(mean, μ, σ, n,  alternative = "two.sided", α = 0.05){
+  if(sum(alternative == c("less", "greater", "two.sided")) == 0) return(NA)
   sdZPróby <- σ / sqrt(n)
   z.stat <- (mean - μ) / sdZPróby
   if(alternative == "less") p.value <- pnorm(z.stat)
@@ -95,11 +107,9 @@ z.test <- function(mean, μ, σ, n,  alternative = "two.sided", α = 0.05){
   names(lista) <- c("p.value", "z.stat", "alternative", "reject")
   return(lista)
 }
-#tu pytanie o parametr funkcji typu factor
-?pnorm
 ```
 
 ```{r echo=TRUE}
-wynik <- z.test(81.2, 76.6, 8.3, 36, 'two.sided') # a tu można wykonać sobie testy
+wynik <- z.test(81.2, 76.6, 8.3, 36, 'less') # a tu można wykonać sobie testy
 wynik
 ```

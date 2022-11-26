@@ -2,6 +2,8 @@
 title: "Praca domowa - testy chi-kwadrat"
 author: "Bartosz Maćkiewicz"
 output: html_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include=FALSE}
