@@ -1,9 +1,10 @@
 # Chi-kwadrat
 
 sym <- replicate(10000, {
-  k <- sum(sample(0:1, 100, replace = T))
-  (k - 50) / sqrt(50)
-})
+                          k <- sum(sample(0:1, 100, replace = T))
+                          (k - 50) / sqrt(50)
+                        }
+                )
 
 hist(sym)
 hist(sym, freq = F)
@@ -88,7 +89,7 @@ chisq.test(zaobserwowane)
 
 chisq.test(zaobserwowane, correct = F)
 
-#stopnie swobody
+#stopnie swobody                                    !!!!!!!!!!!!!!!!!
 #df = (r - 1) * (c - 1) #r i c to liczba kolumn
 
 
