@@ -1,0 +1,148 @@
+---
+title: "Praca domowa - przedziały ufnosci i test *t*"
+author: "Bartosz Maćkiewicz"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Uwagi ogólne
+
+W tym tygodniu będę Państwa prosił o podjęcie próby raportowania wyników analiz statystycznych w bardziej "profesjonalny" sposób. Dobrym punktem startu jest standard APA (lub "styl APA") zaproponowany przez Amerykańskie Towarzystwo Psychologiczne. W sieci znajdą Państwo wiele materiałów dotyczących tego sposobu raportowania wyników (dobrą frazą do wyszukiwania jest "how to report X in APA"), ale ja lubię krótki poradnik ze strony University of Washington znajdujący się tutaj:
+
+<https://psych.uw.edu/storage/writing_center/stats.pdf>
+
+Przeanalizujmy dwa istotne dla Państwa pracy domowej przykłady:
+
+**Test *t* dla jednej próby**
+
+*Students taking statistics courses in psychology at the University of Washington reported studying more hours for tests (M = 121, SD = 14.2) than did UW college students in in general, t(33) = 2.10, p = .034.*
+
+**Test *t* dla powtórzonych pomiarów (test *t* dla prób zależnych)**\*
+
+*Results indicate a significant preference for pecan pie (M = 3.45, SD = 1.11) over cherry pie (M = 3.00, SD =.80), t(15) = 4.00, p = .001.*
+
+**Ważne obserwacje:**
+
+1.  Kierunek różnicy/relacji jest zawsze w sposób wyraźny i konkretny określony (więcej godzin / preferencja X nad Y)
+2.  Zaraportowane są statystyki deskryptywne, średnia (skrót M, o *mean*) oraz odchylenie standardowe (skrót SD od *standard deviation*). Często mogą Państwo oprócz tych statystyk spotkać liczebność próby i medianę.
+3.  Wszystkie liczby są zaokrąglone w celu zwiększenia czytelności tekstu. Statystyki (deskryptywne i inferencyjne) zaokrąglone są do dwóch miejsc po przecinku, wartość $p$ zaokrąglona jest do trzech miejsc po przecinku.
+4.  Dla niskich wartości $p$ ($< 0.001$) zazwyczaj nie wypisuje się całej liczby ze wszystkimi miejscami po przecinku. Tak duża precyzja jest przy raportowaniu wyników z reguły niepotrzebna. Zamiast tego pisze się, że jest mniejsza od jakiegoś progu (np. $p < 0.001$).
+5.  Dla najbardziej popularnych testów statystycznych często nie wskazuje się, jaki test został użyty. Wypisuje się jedynie wielkość statystyki testowej, liczbę stopni swobody i wartość $p$. Oczywiście takie zachowanie jest uzasadnione, tylko jeśli z kontekstu jest jasne, jaki test został przeprowadzony.
+
+**Dodatkowe rzeczy, które można uwzględnić:**
+
+1.  Wielu badaczy przekonuje, że raportując wyniki badań zawsze powinniśmy podać wielkość efektu. W przypadku testu $t$ najbardziej popularnym wyborem jest wartość statystyki $d$ Cohena. Proszę sprawdzić, czym jest ta statystyka i spróbować wyszukać odpowiedni pakiet do R, który ją oblicza.
+
+# Zadanie 1
+
+Pewien inżynier zaprojektował urządzenie do rehabilitacji po przebyciu infekcji wirusem COVID. Pacjenci testujący urządzenie potrzebowali następujących czasów ćwiczeń (w godzinach), żeby w pełni dojść do formy:
+
+```{r}
+times <- c(8, 12, 26, 10, 23, 21, 16, 22, 18, 17, 36, 9)
+```
+
+Skonstruuj 99% przedział ufności dla oczekiwanego czasu potrzebnego na dojście do formy.
+
+```{r}
+odchylenie <- sd(times)
+średnia <- mean(times)
+dolna_granica <- qnorm(0.005, średnia, odchylenie / sqrt(8))
+górna_granica <- qnorm(0.995, średnia, odchylenie / sqrt(8))
+
+```
+
+Co możesz wywnioskować z obliczonego przez siebie przedziału ufności?
+
+*Średni czas ćwiczeń potrzebny do pełnego dojścia do formy używając tego urządzenia na 99% znajduje się w przedziale \<10,78; 25,55\>h*
+
+# Zadanie 2
+
+Przeprowadzono badania, które miały na celu ustalenie wpływu hipnozy na redukcję bólu. Wyniki eksperymentu przedstawia poniższa tabela (zmienną zależną jest poziom odczuwalnego bólu wyrażony na odpowiedniej skali).
+
+```{r}
+# Przed hipnozą
+przed <- c(6.6,  6.5,  9.0,  10.3,  11.3,  8.1,  6.3,  11.6)
+# Po hipnozie
+po <- c(6.8,  2.5,  7.4,  8.5,   8.1,   6.1,  3.4,  2.0)
+```
+
+Czy na poziomie istotności 5% można stwierdzić, że hipnoza redukuje odczuwalny ból?
+
+```{r}
+t.test(przed, po, paired = T, conf.level = 0.95)
+```
+
+*Wyniki wskazują na znaczne obniżenie poziomu bólu po hipnozie względem przed jej zastosowaniem, t(7)=3.03, p=0.019*
+
+# Zadanie 3
+
+Everitt opisał kilka różnych terapii, mających pomóc w leczeniu anoreksji. 29 dziewcząt wzięło udział w terapii poznawczo-behawioralnej, a ich waga była mierzona przed i po terapii. Przystost wagi dziewcząt w funtach dany jest poniżej. Wyniki zostały otrzymany przez odjęcie wagi przed rozpoczęciem terapii od wagi po zakończeniu terapi. Z tego względu wyniki ujemne reprezentują spadek wagi a wyniki dodatnie - wzrost.
+
+```{r}
+rWag <- c(1.7, 0.7, -0.1, -0.7, -3.5, 14.9, 3.5, 17.1, -7.6,
+  1.6, 11.7, 6.1, 1.1, -4.0, 20.9, -9.1, 2.1, -1.4, 1.4,
+  -0.3, -3.7, -0.8, 2.4, 12.6, 1.9, 3.9, 0.1, 15.4, -0.7)
+```
+
+a.  Ja wygląda rozkład tych wartości (stwórz odpowiedni histogram lub wykorzystaj inną metodę wizualizacji rozkładu)?
+b.  Czy wzrost wagi dziewcząt w tej grupie jest statystycznie istotny?
+c.  Oblicz 95% przedział ufności na podstawie tych wyników.
+
+```{r}
+#a)
+hist(rWag)
+abline(v = 0, lwd = 3, col = "red")
+
+#b) i c)
+t.test(rWag)
+```
+
+*Po udziale w terapii poznawczo-behawioralnej waga dziewcząt znacząco wzrosła, t(28) = 2.22, p = 0.035. 95% przedział ufności na podstawie tych wyników to \<0.23; 5.79\>*
+
+# Zadanie 4
+
+Ten przykład wzięty jest z klasycznego artykułu autorstwa Kaufmana i Rocka (1962) dotyczącego iluzji księżycowej. Przez wiele lat zjawisko to fascynowało psychologów (i nie tylko ich!). Iluzja księżycowa polega na tym, że kiedy widzimy księżyc blisko horyzontu, wydaje nam się zdecydowanie większy, niż wtedy gdy jest wysoko na niebie. Kaufman i Rock postawili hipotezę, że iluzja ta może zostać wyjaśnienia na podstawie większej pozornej odległości, gdy księżyć znajduje się blisko horyzontu. Częścią bardzo rozbudowanej serii eksperymentów autorów było badanie, które celem była estymacja iluzji księzycowej. Badacze prosili w eksperymencie uczestników, aby dostosowali wielkość ,,księżyca'' widniejącego na horyzoncie tak, aby odpowiadała rozmiarowi księżyca w zenicie i *vice versa*. Oczywiście, nie używali prawdziwego księżyca, ale specjalnej aparatury eksperymentalnej, która księżyc symulowała.
+
+Nasze pierwsze pytanie dotyczy tego, czy aparatura rzeczywiście wytwarzała w badanych iluzję księżycową, to znaczy czy faktycznie dopasowanie wielkości księżyca na horyzoncie wymagało zwiększenia skali na urządzeniu w porównaniu do księżyca w zenicie. Dane pochodzace od 10 uczestników (`kaufman1962.csv`) pochodzą z artykułu Kaufmana i Rocka i zawierają stosunek średnicy zmiennego i standardowego ,,księżyca''. Stosunek wynoszacy 1.00 oznacza brak iluzji. Z kolei wszystkie wartości inne niż 1.00 oznaczają iluzje. Na przykład, wartość 1.50 oznacza, że księżyc na horyzoncie miał pozorną średnicę 1.50 większą, niż średnica księżyca w zenicie.
+
+Czy iluzja faktycznie występuje? Proszę sprawdzić to korzystając z odpowiedniego testu oraz opisać wyniki swojej analizy.
+
+```{r}
+kaufman <- read.csv("Prace Domowe//Dane//kaufman1962.csv")
+
+t.test(kaufman, y = rep(1, 10))
+
+```
+
+*Wyniki wskazują na istnienie wyrażnej iluzji w różnicy wielkości księżyca nad horyzontem vs w zenicie, t(9) = 4.29, p = 0.002*
+
+# Zadanie 5
+
+Kruger and Dunning (1999) opublikowali artykuł zatytułowany "Unskilled and unaware of it", w którym testowali hipotezę, zgodnie z którą osoby, które słabo wykonują zadania są nieświadome swoich niskich umiejętności logicznego myślenia. Każdy ze studentów (uczestników badania) został poproszony o ocenę, w którym centylu wyników przeprowadzonego testu na logiczne myślenie się znajdują. Jedenastka studentów, którzy w teście uplasowali się w najniższym kwartylu, oceniali się średnio na 68 percentyl. Dokładnie wyniki o takiej samej średniej i odchyleniu jak w artykule Krugeg i Dunninga znajdą Państwo w pliku `kruger1999.csv`.
+
+Czy mamy tutaj do czynienia z przypadkiem "wszystkie dzieci są powyżej przeciętnej"? Innymi słowy, czy średni estymowany percentyl wyższy jest niż 50?
+
+```{r}
+kruger <- read.csv("Prace Domowe//Dane//kruger1999.csv")
+alt <- rep(50, 11)
+t.test(kruger, y = alt)
+
+```
+
+*Wśród studentów, którzy uplasowali się w najniższym kwartylu, średni estymowany percentyl jest istotnie wyższy niż 50, t(10) = 4.64, p \< 0.001*
+
+# Zadanie 6
+
+Hout, Duncan, and Sobel (1987) opisali wyniki badań dotyczących względnego poziomu satysfakcji seksualnej małżeństw, w którym udział wzięło 91 par. W badaniu poprosili każdego z małżonków aby wskazał, jak bardzo zgadza się z twierdzeniem "Seks jest frajdą dla mnie i mojego partnera/partnerki" na czteropoziomowej skali przebiegającą od 1 ("nigdy lub sporadycznie") do 4 ("prawie zawsze"). Dane znajdują się w pliku `hout1987.csv`. Przeprowadź test $t$ dla prób zależnych i opisz oraz zinterpretuj wyniki swojej analizy.
+
+```{r}
+hout <- read.csv("Prace Domowe//Dane//hout1987.csv")
+t.test(hout$Husband, hout$Wife, paired = T)
+```
+
+*Wyniki pokazują brak istotnej różnicy w percepcji satysfakcji seksualnej małżeństw między mężem a żoną, t(90) = -0.48, p = 0.629*
+
+Dlaczego test *t* dla prób zależnych można uznać tutaj za właściwą procedurę statystyczną?
+
+*Ponieważ seks w małżeństwie jest jedną czynnością wykonywaną przez 2 osoby, zatem mimo że mąż i żona opisują go niezależnie, to opisują tą samą czynność*

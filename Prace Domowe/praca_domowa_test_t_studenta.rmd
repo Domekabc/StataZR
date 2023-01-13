@@ -1,0 +1,76 @@
+---
+title: "Praca domowa (test t)"
+author: "Bartosz Maćkiewicz"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Zadanie 1
+
+W poprzednim tygodniu analizowaliśmy dane zebrane przez Everitta pokazujące, że cierpiące na anoreksje dziewczęta, które poddane były terapii poznawczo-behawioralnej przybierały na wadze podczas terapi. Jest jednak możliwe, że przybierały na wadze po prostu dlatego, że były coraz starsze. Jednym ze sposobów kontrolowania wpływu tego czynnika byłoby porównanie zmiany wagi w grupie pacjentek poddawanych terapii poznawczo-behawioralnej ($n = 29$) z grupą kontrolną ($n = 26$), to znaczy z grupą dziewcząt, które nie poddały się terapii. 
+
+Dane z eksperymentu znajdują się w pliku `Ex7-31.dat`.
+
+1. Przeprowadź odpowiedni test, którym porównasz średnie w grupach. Co wywnioskujesz z wyniku testu? Czy dla konkluzji ma znaczenie kierunkowość naszych przewidywań? A rodzaj testu $t$ jaki zastosujemy?
+
+```{r}
+dane1 <- read.table("Prace Domowe//Dane//Ex7-31.dat")
+dane1 <- dane1[-1,]
+kontrolna <- dane1$V2[dane1$V3 == 1]
+badawcza <- dane1$V2[dane1$V3 == 2]
+kontrolna <- as.numeric(kontrolna)
+badawcza <- as.numeric(badawcza)
+
+t.test(badawcza, kontrolna)
+t.test(badawcza, kontrolna, alt = "g")
+
+```
+
+2. Oblicz przedział ufności dla różnicy między średnimi oraz oblicz wartość wielkości efektu $d$. Poszukaj w internecie lub zastanów się w jaki sposób obliczyć przedział ufności dla $d$ i oblicz przedział ufności dla $d$.
+
+```{r}
+library(effsize)
+cohen.d(badawcza, kontrolna)
+
+```
+
+*W tym konkretnym przypadku kierunkowość nie ma znaczenia, natomiast przy innych danych mogłaby mieć. Rodzaj testu przy różnej wielkości próbach nie ma znaczenia, ponieważ tylko jeden rodzaj testu t jest możliwy. Gdyby wielkość grup była identyczna, możnaby przeprowadzić Paired t-test, co mogłoby mieć znaczenie. || Wynik testu wskazuje na nieistotną statystycznie różnicę pomiędzy wagą dziewczyn po terapii oraz tych, które na terapię nie chodziły, t(50.97) = 1.67, p = 0.101. Oznacza to, że wpływ terapii na zmianę wagi u dziewcząt z anoreksją jest statystycznie nieistotny. || Przedział ufności między średnimi to <-0.7; 7.62>. Wielkość efektu d według testu Cohena to d = 0.45, czyli mała. Przedział ufności 95% dla wielkości efekto to <-0.1; 1>*
+
+# Zadanie 2
+
+W Teście Tematycznej Apercepcji Murraya badanym prezentuje się wieloznaczne rysunki przedstawiające sceny z życia społecznego i prosi się ich o opowiedzenie historii dla każdego z rysunków. Uzyskane w ten sposób opisy mogą być oceniane na wiele sposobów. Werner, Stebenau i Pollin (1970) poprosili matki 20 dzieci cierpiących na schizofrenię i 20 dzieci, które na schizofrenię nie cierpiały, aby poddały się Testowi Tematycznej Apercepcji Murraya. Badacze następni zliczali, ile z zebranych opisów (przedstawionych obrazków było 10) przedstawiało pozytywną relację między dzieckiem a rodzicem. Dane z eksperymentu znajdują się w pliku `Ex7-37.dat`.
+
+1. Jak sądzisz, jaka hipoteza eksperymentalna stała za tym badaniem?
+
+*Tu miejsce na Twoją odpowiedź*
+
+2. Przeprowadź odpowiedni test sprawdzający tę hipotezę i opisz, co z jego wyników można wywnioskować.
+
+```{r}
+# Tu miejsce na Twój kod
+```
+
+# Zadanie 3
+
+Badania na próbach klinicznych sugerują, że w przypadku dzieci, które doświadczyły śmierci rodzica może istnieć zwiększone ryzyko depresji lub stanów lękowych w dorosłym życiu. Mireault i Bond (1992) zebrali dane dotyczące 140 studentów koledżu, którzy doświadczyli śmierci rodzica, 182 studentów z "pełnych" rodzin (oboje rodziców) oraz 59 studentów z rozwiedzionych rodzin. Dane z eksperymentu znajdują się w pliku `Mireault.dat`.
+
+1. Używając odpowiedniego testu porównaj wyniki uczniów należących do dwóch pierwszych grup na skali Depresji (`DepressT`), Lęku (`AnxT`)i Ogólnych Symptomów (Global Symptom Index, `GSIT`) (wyniki pochodzą z *Brief Symptom Inventory*, który służy do identyfikacji klinicznie istotnych symptomów psychologicznych). Jaka będzie Twoja konkluzja?
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+*Tutaj miejsce na Twoją odpowiedź*
+
+2. Mówi się, że kobiety (`1`) przejawiają więcej objawów lęku i depresji niż mężczyzni (`2`). Czy dane Mireault i Bond wspierają tę obserwacje?
+
+```{r}
+# Tutaj miejsce na Twój kod
+```
+
+*Tutaj miejsce na Twoją odpowiedź*
