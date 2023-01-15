@@ -47,13 +47,20 @@ W Teście Tematycznej Apercepcji Murraya badanym prezentuje się wieloznaczne ry
 
 1. Jak sądzisz, jaka hipoteza eksperymentalna stała za tym badaniem?
 
-*Tu miejsce na Twoją odpowiedź*
+*Chorowanie dziecka na schizofrenię znacząco wpływa na pozytywny odbiór relacji dziecka z rodzicem*
 
 2. Przeprowadź odpowiedni test sprawdzający tę hipotezę i opisz, co z jego wyników można wywnioskować.
 
 ```{r}
-# Tu miejsce na Twój kod
+dane <- read.table("Prace Domowe/Dane/Ex7-37.dat")
+g1 <- dane$V1[dane$V2 == 1]
+g2 <- dane$V1[dane$V2 == 2]
+g1 <- as.integer(g1)
+g2 <- as.integer(g2)
+t.test(g1, g2)
 ```
+
+*Wyniki obu grup wskazują na istotną różnicę w pozytywnym odbiorze relacji dziecka z rodzicem pomiędzy rodzicami dzieci zdrowych i chorych na schizofrenię, t(36.7) = 2.66, p = 0.011*
 
 # Zadanie 3
 
@@ -62,15 +69,43 @@ Badania na próbach klinicznych sugerują, że w przypadku dzieci, które doświ
 1. Używając odpowiedniego testu porównaj wyniki uczniów należących do dwóch pierwszych grup na skali Depresji (`DepressT`), Lęku (`AnxT`)i Ogólnych Symptomów (Global Symptom Index, `GSIT`) (wyniki pochodzą z *Brief Symptom Inventory*, który służy do identyfikacji klinicznie istotnych symptomów psychologicznych). Jaka będzie Twoja konkluzja?
 
 ```{r}
-# Tutaj miejsce na Twój kod
+Mireault <- read.table("Prace Domowe/Dane/Mireault.dat", header = T, na.strings = ".")
+depr <- t.test(Mireault$DepressT[Mireault$Group == 1], 
+               Mireault$DepressT[Mireault$Group == 2], 
+               na.rm = T)
+anx <- t.test(Mireault$AnxT[Mireault$Group == 1], 
+               Mireault$AnxT[Mireault$Group == 2], 
+               na.rm = T)
+
+gsit <- t.test(Mireault$GSIT[Mireault$Group == 1], 
+               Mireault$GSIT[Mireault$Group == 2], 
+               na.rm = T) 
+
+depr
+anx
+gsit
 ```
 
-*Tutaj miejsce na Twoją odpowiedź*
+*Dane z experymentu Mireaulta zdecydowanie wskazują na brak jakiegokolwiek zwiększenia w ryzyku depresji u osób, które za dziecka straciły rodzica względem osób z pełnych rodzin. Wszystkie testy (depresji, lęku i GSI) wskazują na brak istotnych różnic między dwoma grupami*
 
 2. Mówi się, że kobiety (`1`) przejawiają więcej objawów lęku i depresji niż mężczyzni (`2`). Czy dane Mireault i Bond wspierają tę obserwacje?
 
 ```{r}
-# Tutaj miejsce na Twój kod
+t.test(Mireault$DepressT[Mireault$Gender == 1],
+       Mireault$DepressT[Mireault$Gender == 2],
+       na.rm = T,
+       )
+mean(Mireault$DepressT[Mireault$Gender == 1], na.rm = T)
+mean(Mireault$DepressT[Mireault$Gender == 2], na.rm = T)
+
+sd(Mireault$DepressT[Mireault$Gender == 1], na.rm = T)
+sd(Mireault$DepressT[Mireault$Gender == 2], na.rm = T)
+
+
+t.test(Mireault$AnxT[Mireault$Gender == 1],
+       Mireault$AnxT[Mireault$Gender == 2],
+       na.rm = T,
+       )
 ```
 
-*Tutaj miejsce na Twoją odpowiedź*
+*Dane wskazują, że kobiety(M = 63.09, SD = 10.53) przejawiają więcej objawów depresji od męszczyzn(M = 59.66, SD = 8.61), t(248.35) = 3.26, p = 0.001; natomiast nie wspierają takiego stwierdzenia w kontekście lęku, t(246.26) = 1.67, p = 0.096.*

@@ -1,0 +1,193 @@
+---
+title: "Praca domowa"
+author: "Bartosz Maćkiewicz"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Zadanie I
+
+Kapp, Frysinger, Gallagher i Hazelton (1979) wykazali, że lezja ciała migdałowatego może zmniejszać niektóre reakcje łączone zazwyczaj ze strachem (np. obniżać tętno). Jeśli poziom strachu dałoby się rzeczywiście w ten sposób obniżać, to ze względu na ich obniżoną awersję do pewnych bodźców zwierzęta poddane lezji powinno być trudniej wyuczyć reakcji unikania.
+
+Wyobraź sobie, że prowadzisz badania nad dwiema grupami królików: w jednej zwierzęta poddano lezji ciała migdałowatego, druga to grupa kontrolna ze zwierzętami, których nie poddawano żadnym zabiegom. Dane w pliku przedstawiają dla każdego zwierzęcia liczbę prób wyuczenia reakcji unikania (1 - grupa z lezją, 2 - grupa kontrolna).
+
+1. Wczytaj dane do R.
+2. Czy dane wspieraja hipotezę przedstawioną przez badaczy? Przeanalizuj je za pomocą odpowiedniego testu nieparametrycznego (test dwustronny).
+3. Przeanalizuj dane za pomocą tego samego testu, tylko że w tym wypadku użyj testu jednostronnego zgodnego z hipotezą badawczą.
+4. Przedstaw graficznie dane z zadania. Możesz stworzyć wykres używając biblioteki standardowej R lub pakietu `ggplot2`
+5. W jaki sposób opisać wyniki takiego badania? Znajdź w internecie przykłady opisu wyników zastosowanego testu w standardzie APA i napisz (po polsku lub angielsku) odpowiedni paragraf.
+
+```{r}
+zad1 <- read.table("Prace Domowe/Dane/zadanie1.dat",
+                   header = T)
+#test obustronny i jednostronny
+wilcox.test(zad1$DV[zad1$Group == 1],
+            zad1$DV[zad1$Group == 2],
+            )
+wilcox.test(zad1$DV[zad1$Group == 1],
+            zad1$DV[zad1$Group == 2],
+            alternative = 'g'
+            )
+
+#przedstawienie graficzne
+library(ggplot2)
+zad1$Group <- as.factor(zad1$Group)
+plot <- ggplot(zad1, aes(x = DV, y = Group)) + geom_boxplot()
+plot + coord_flip()
+```
+
+*Wilcoxon rank sum test was used to compare avarage number of attempts to teach avoidance reaction in two groups of rabbits(test group with lesions N = 11, control group without any operations N = 9). The test results were W = 91, p < 0.002 which is statistically significant*
+
+# Zadanie II
+
+Mówi się, że pierwsze dziecko bywa zazwyczaj bardziej niezależne niż dzieci urodzone jako drugie lub kolejne. Załóżmy, że dysponujemy 25-stopniową skalą niezależności i oceniamy na niej każde z 20 pierworodnych dzieci wraz z ich bratem lub siostrą urodzonymi jako drugie dziecko w rodzinie. Pomiaru dokonujemy, gdy każde z rodzeństwa jest już dorosłe, eliminując tym samym oczywistą różnice wieku. Dane z tego eksperymentu znajdują sie w pliku.
+
+```{r}
+zad2 <- read.table("Prace Domowe/Dane/zadanie2.dat",
+                   header = T)
+#test prób zależnych
+wilcox.test(zad2$First, zad2$Second, paired = T)
+mean(zad2$First)
+mean(zad2$Second)
+
+#test prób niezależnych
+wilcox.test(zad2$First, zad2$Second)
+
+zad2$Difference <- zad2$First - zad2$Second
+
+dev.off(dev.list()["RStudioGD"]) 
+plot(zad2$Difference ~ zad2$First)
+reg <- lm(zad2$Difference ~ zad2$First)
+abline(reg)
+
+library(vioplot)
+par(mfrow = c(1,1))
+vioplot(subset(zad2, select = c("First", "Second")))
+```
+
+1. Wczytaj dane do R.
+2. Czy dane wspieraja hipotezę przedstawioną przez badaczy (że pierwsze dzieci są bardziej niezależne)? Przeanalizuj je za pomocą odpowiedniego testu nieparametrycznego.
+3. Czy to, że możemy potraktować nasze dane jako próby zależne sprawia, że dochodzimy do innej konkluzji niż gdyby to były próby niezależne? Powtórz test z poprzedniego punktu z tą różnicą, że tym razem przyjmij, że obserwacji nie możesz połączyć w pary.
+4. Intepretacja wyników nie jest jednak tak prosta, jak zdawałoby się to na pierwszy rzut oka. Stwórz wykres, w którym różnice w parach będą funkcją wyniku pierwszego dziecka. Do jakich wniosków prowadzi Cię ten wykres?
+5. Przedstaw graficznie dane z zadania. Możesz stworzyć wykres używając biblioteki standardowej R lub pakietu `ggplot2`
+6. W jaki sposób opisać wyniki takiego badania? Znajdź w internecie przykłady opisu wyników zastosowanego testu w standardzie APA i napisz (po polsku lub angielsku) odpowiedni paragraf.
+
+*2) Dane wspierają hipotezę postawioną przez badaczy, V = 164, p = 0.028*
+*3) Tak, ma to znaczenie. Gdyby próby te były niezależne, wyniki byłyby nieznaczące statystycznie*
+*4) Wykres ten sugeruje, że poziom niezależności drugiego dziecka jest odwrotnie proporcjonalny do poziomu niezależności drugiego dziecka. Zatem to indywidualny poziom niezależności pierwszego dziecka może mieć wpływ na poziom niezależności dziecka drugiego.*
+*6) Wilcoxon signed rank test for paired variables was used to compare independence level between first and second child in 20 pairs of siblings. The result indicate that the second child is significantly less independent than the first, V = 164, p = 0.028*
+
+# Zadanie III
+
+Trzech rywalizujących ze sobą nauczycieli angielskiego na podstawowym poziomie uważa, że to każdy z nich ma zaszczyt uczyć najlepszych uczniów. Żeby rozstrzygnąć, który z nich ma rację, zostało wylosowanych po ośmiu uczniów z każdej z ich klasy. Każdy uczeń dostał do rozwiązania ten sam egzamin, który oceniany był przez neutralnego nauczyciela niewiedzącego, z której klasy są oceniani przez niego uczniowie. Oto wyniki uczniów:
+
+```{r}
+zad3 <- read.table("Prace Domowe/dane/zadanie3.dat", 
+                   header = T)
+shapiro.test(zad3$Grade)
+#ten test mówi nam, że te dane mają rozkład normalny
+#jednak sprawdzę rozkłady dla poszczególnych profesorów
+
+shapiro.test(zad3$Grade[zad3$Prof == 1])
+shapiro.test(zad3$Grade[zad3$Prof == 2])
+shapiro.test(zad3$Grade[zad3$Prof == 3])
+#testy dla każdego z profesorów to potwierdzają, zatem odpowiednim testem będzie tutaj ANOVA
+
+oneway.test(zad3$Grade ~ zad3$Prof)
+
+vioplot(zad3$Grade ~ zad3$Prof)
+```
+
+1. Wczytaj dane do R.
+2. Czy kontrowersję między nauczycielami da się rozstrzygnąć na podstawie wyników tego eksperymentu? Przeprowadź odpowiedni test nieparametryczny.
+3. Załóżmy, że przyjęliśmy prawdopodobieństwo błędu typu I $\alpha = 0.1$ i po przeprowadzeniu głównego testu postanowiliśmy sprawdzić za pomocą testu *post-hoc* którzy z nauczycieli różnią się od siebie. Przeprowadź odpowiedni test, aby to sprawdzić.
+4. Przedstaw graficznie dane z zadania. Możesz stworzyć wykres używając biblioteki standardowej R lub pakietu `ggplot2`
+5. W jaki sposób opisać wyniki takiego badania? Znajdź w internecie przykłady opisu wyników zastosowanego testu w standardzie APA i napisz (po polsku lub angielsku) odpowiedni paragraf.
+
+*Tutaj miejsce na Twoją odpowiedź*
+
+# Zadanie IV
+
+Psycholog pracujący w poprawczaku potrzebuje wykazać, że poprawczak jest skuteczny w obniżaniu przestępczości. Wziął wiec próbę dziewieciu osób mieszkajacych z rodzicami (1 w pliku), których policja zindentyfikowała jako sprawiających problemy, dziewieciu podobnych osób z rodzin zastępczych (2 w pliku) oraz dziewięciu mieszkajacych w poprawczaku (3 w pliku). Jako wskaźnik redukcji przestępczości użył liczby dni, w ciągu których uczniowie opuścili zajęcia szkolne. Dane te mógł z łatwością uzyskać od administracji szkół.
+
+1. Wczytaj dane do R.
+2. Czy dane potwierdzają skuteczność poprawczaka? Przeanalizuj je za pomocą odpowiedniego testu nieparametrycznego. 
+3. Przeprowadź odpowiedni test, aby to sprawdzić, czy występuje istotna statystycznei róznica między osobami mieszkającymi z rodzicami a tymi z poprawczaka.
+4. Przedstaw graficznie dane z zadania. Możesz stworzyć wykres używając biblioteki standardowej R lub pakietu `ggplot2`
+5. W jaki sposób opisać wyniki takiego badania? Znajdź w internecie przykłady opisu wyników zastosowanego testu w standardzie APA i napisz (po polsku lub angielsku) odpowiedni paragraf.
+
+```{r}
+zad4 <- read.table("prace domowe/dane/zadanie4.dat", header = T)
+
+kruskal.test(DV ~ Home, data = zad4) #test kruksala wskazuje na istotne różnice w opuszczaniu zajęć pomiędzy grupami
+wilcox.test(zad4$DV[zad4$Home == 1], 
+            zad4$DV[zad4$Home == 3], 
+            ) #test wilcoxona wskazuje jednak na brak znaczących różnic pomiędzy osobami z poprawczaka a tymi mieszkającymi z rodzicami
+library(ggplot2)
+plot4 <- ggplot(zad4, aes(x = DV, y = Home)) + geom_violin()
+plot4 + coord_flip()
+#nie wiem czemu u mnie ten wykres nie działa, powinien
+
+vioplot(zad4$DV ~ zad4$Home)
+
+```
+
+*Test kruksala zastosowany na wszystkich trzech próbach dał wyniki istotne statystycznie(chi^2 = 6.78, df = 2, p = 0.034), natomiast test Wilcoxa na próbach osób mieszkających z rodziną i tych z poprawczaka dał wynik statystycznie nieistotny(W = 56, p = 0.184). Patrząc na wykres wiolinowy wyraźnie widać, że odstającą grupą jest grupa 2, czyli ta mieszkająca z rodziną zastępczą, zatem to ona musiała spowodować statystycznie istotną różnicę pomiędzy wszystkimi grupami w teście Kruksala*
+
+# Zadanie V
+
+W badaniu o skutkach zindywidualizowanej opieki nad młodzieżą z poważnymi problemami emocjonalnymi Burchard i Schaefer (1990) zaproponowali, aby opiekunowie oceniali obecność lub brak określonych zachowań dla każdego z 40 podopiecznych każdego dnia. Żeby sprawdzić wiarygodność sędziów, poprosili dwóch z nich, aby ocenili każdego z podpopiecznych. W pliku znajdują się dane dotyczące „skrajnie obelżywego języka".
+
+```{r}
+zad5 <- read.table("prace domowe/dane/zadanie5.dat", header = T)
+countsToCases <- function(x, countcol = "Freq") {
+    # Get the row indices to pull from x
+    idx <- rep.int(seq_len(nrow(x)), x[[countcol]])
+
+    # Drop count column
+    x[[countcol]] <- NULL
+
+    # Get the rows from x
+    x[idx, ]
+}
+dane <- countsToCases(zad5)
+library(irr)
+agree(dane) #procentowa zgodność %-agree = 92.5
+kappa2(dane) #kappa = 0.832, zatem różnica to ~0.1 co jest moim zdaniem istotną wielkością
+
+```
+
+1. Wczytaj dane do R. **UWAGA** Aby użyć funkcji z pakietu `irr` niezbędne będzie dokonanie odpowiedniej konwersji danych. Odpowiednie informacje można znaleźć tutaj:
+http://www.cookbook-r.com/Manipulating_data/Converting_between_data_frames_and_contingency_tables/
+2. Oblicz procentową zgodę między sędziami kompetentnymi.
+3. Oblicz Kappę Cohena. Jak dużo mniejsza jest tak obliczona zgoda od zgody obliczonej w poprzednim punkcie?
+4. W jaki sposób opisać wyniki tego eksperymentu? Znajdź w internecie przykłady opisu wyników zastosowanego testu i napisz (po polsku lub angielsku) odpowiedni paragraf.
+
+*Wykonałem test na Kappę Cohena aby sprawdzić zgodę pomiędzy dwoma oceniającymi. Przy 40 podmiotach ocenianych wkaźnik Kappy Cohena wyniósł 0.83(p<0.001), co oznacza silną zgodę pomiędzy oceniającymi.*
+
+# Zadanie VI
+
+Hout, Duncan i Sobel (1987) przedstawiają dane dotyczące relatywnej satysfakcji seksualnej małżeństw. Poprosili osobno każdego z małżonków spośród 91 badanych par o ocenę tego, w jakim stopniu zgadzają się ze stwierdzeniem „Seks jest zawsze przyjemnością dla mnie i mojego partnera" na czerostopniowej skali od "nigdy lub prawie nigdy" do "prawie zawsze". Dane w pliku przedstawiaja liczbę poszczególnych wzorców odpowiedzi w formacie (`odpowiedź męża - odpowiedź żony - liczba takich kombinacji`).
+
+1. Wczytaj dane do R. **UWAGA** Aby użyć odpowiedniej funkcji niezbędne będzie dokonanie odpowiedniej konwersji danych. Odpowiednie informacje można znaleźć tutaj tutaj:
+http://www.cookbook-r.com/Manipulating_data/Converting_between_data_frames_and_contingency_tables/
+2. Co możemy powiedzieć o różnicach w satysfakcji seksualnej między kobietami i mężczyznami na podstawie tych danych?
+3. Czy umiesz wymyślić jakiś ciekawy graficzny sposob przedstawienia wyników tego eksperymentu? Jeżeli tak - to zrób to! [ja nie umiem - B.M.]
+4. W jaki sposób opisać wyniki tego eksperymentu? Znajdź w internecie przykłady opisu wyników zastosowanego testu i napisz (po polsku lub angielsku) odpowiedni paragraf.
+
+```{r}
+zad6 <- read.table("prace domowe/dane/zadanie6.dat", header = T)
+
+dane <- countsToCases(as.data.frame(zad6))
+
+wilcox.test(dane$Husband, dane$Wife, paired = T)
+
+
+```
+
+*Zgodnie z testem wilcoxa różnice w relatywnej satysfakcji małżeństw nie są istotne statystycznie (zatem można przyjąć, że ich nie ma), V=800.5, p = 0.663*

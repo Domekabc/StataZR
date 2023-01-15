@@ -1,0 +1,113 @@
+---
+title: "Praca domowa - regresja i korelacja"
+author: "Bartosz Maćkiewicz"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+W afryce subsaharyjskiej ponad połowa matek traci przynajmniej jedno dziecko przed jego pierwszymi urodzinami. Proszę wczytać z pliku `Ex-9-1.dat` dane dotyczące 36 państw tego regionu zawierające:
+
+* kraj 
+* śmiertelność noworodków
+* dochód *per capita* wyrażony w amerykańskich dolarach
+* procentowy udział w urodzeniach matek poniżej 20 roku życia 
+* procentowy udział w urodzeniach matek powyżej 40 roku życia
+* procentowy udział urodzeń następujących mniej niż 2 lata po poprzednim urodzeniu
+* procentowy udział kobiet, których potrzeby w zakresie planowania rodziny są niezaspokojone.
+
+## Zadanie 1
+
+1. Narysuj wykres punktowy pokazujący relację między dochodem i śmiertelnoścą noworodków. Zadanie wykonaj na dwa sposoby. Pierwszy wykres narysuj, korzystając ze standardowych funkcji graficznych R. Drugi wykres narysuj, używając pakietu `ggplot2`.
+
+2. Do obu wykresów dodaj linię regresji.
+
+```{r}
+library(DescTools) 
+dane_a <- read.table("Prace Domowe/Dane/Ex9-1.dat",
+                     sep = AscToChar(09),
+                     row.names = 1,
+                     header = T)
+
+regr <- lm(dane_a$INCOME ~ dane_a$INFMORT)
+
+plot(dane_a$INCOME ~ dane_a$INFMORT)
+abline(regr)
+
+
+library(ggplot2)
+plot1 <- ggplot(dane_a, aes(x = INFMORT, y = INCOME)) + geom_point()
+plot1 
+#plot1 + geom_smooth(method = "lm", se = F)
+#wykomentowany kod pokazuje linię regresji, ale nie taką, jaka powinna być. Nie mogłem znaleźć szczegółów na temat działania tej funkcji, ale była ona w kilku miejscach rekomendowana, także zdecydowałem się ją zamieścić.
+
+plot1 + geom_abline(intercept = regr$coefficients[1], slope = regr$coefficients[2])
+
+
+```
+
+3. Zastanów się a następnie przetestuj, jaki efekt mogą mieć na linię regresji dwie obserwacje skrajne. 
+
+```{r}
+dane_b <- dane_a[dane_a$INCOME < 4000,]
+regr_b <- lm(dane_b$INCOME ~ dane_b$INFMORT)
+
+
+plot(dane_a$INCOME ~ dane_a$INFMORT)
+abline(regr)
+abline(regr_b, col =  'red')
+
+#dwie skrajne obserwacje znacząco wpływają na linię regresji - w bardzo wyraźny sposób ją pochylają
+```
+
+## Zadanie 2
+
+1. Oblicz współczynnik korelacji między wszystkimi parami zmiennych numerycznych w tym zbiorze danych. Możesz użyć do tego funkcji `cor` lub zainteresować się pakietem `rstatix`, w którym znajduje się ciekawa i przydatna funkcja `cor_test`.
+
+```{r}
+library(rstatix)
+wyniki <- cor_test(dane_a, vars = colnames(dane_a[,1:7]))
+```
+
+2. Przygotuj reprezentację graficzną tych korelacji. Skorzystaj z jednego z omówionych na zajęciach pakietów lub znajdź samemu bibliotekę służącą do wizualizacji macierzy korelacji.
+
+```{r}
+library(corrplot)
+corrplot.mixed(corr = cor(dane_a[,1:7], use = "pairwise.complete.obs"))
+```
+
+2. Jak duża musiałaby być korelacja w tym zbiorze danych, żeby była istotna statystycznie dla $\alpha = 0.05$? A jaka dla $0.01$? Można posłużyć się funkcją `uniroot`. Aby wykonać to zadanie należy skonsultować się ze wzorem na statystykę testową t dla testu na istotność korelacji (wzór jest podany w notatniku). Funkcja `uniroot` nie jest niezbędna do wykonania tego zadania, ale warto się nią pobawić. Poniżej krótki przykład jak za pomocą funkcji `uniroot` znaleźć miejsce zerowe równania $x^3 + 3x^2 + \sqrt{2}x - 7/11$
+
+```{r}
+uniroot(function(x){x^3 + 3 * x^2 + sqrt(2) * x - 7/11}, c(-100, 100)) # obliczamy miejsce zerowe dla zadanej funkcji
+(function(x){x^3 + 3 * x^2 + sqrt(2) * x - 7/11})(0.2749339) # sprawdzamy, czy się zgadza... jest w miarę ok!
+```
+
+```{r}
+n <- 24 #bo i tak wszędzie używamy n-2
+t_stat <- qt(0.975, 24) #szukamy takich r, dla których wartość |t| > t_stat
+#|t| > t_stat -> |sqrt(n) * r / (1 - r^2)| > t_stat -> |sqrt(n) * r / (1 - r^2)| - t_stat > 0
+
+Ts <- function(x){sqrt(n) * x / (1 - x^2) - t_stat}
+uniroot(Ts, c(-1, 1)) # |r| > 0.365 aby regresja była statystycznie istotna przy alfa = 0.05
+
+#dla alfa = 0.01
+t_stat <- qt(0.995, 24)
+uniroot(Ts, c(-1, 1)) #|r| > 0.45 aby regresja była statystycznie istotna
+
+```
+
+3. Które predyktory śmiertelności noworodków są najsilniejsze? Oceń to na podstawie wielkości współczynnika korelacji. Sprawdz również statystyczną istotność tych współczynników.
+
+```{r}
+library(dplyr)
+inf_pred <- wyniki[wyniki$var2 == "INFMORT",]
+inf_pred <- inf_pred[order(-abs(inf_pred$cor)),]
+inf_pred
+```
+
+*Wszystko znajduje się w data.frame'ie 'inf_pred' - najsilniejsze predyktory to po kolei INCOME, CONTRACE, NEED, YOUNGMOM, TOOSOON, OLDMOM. Statystycznie istotne są tylko dwa najsilniejsze - INCOME (p = 0.003) i CONTRACE (p = 0.025).*
