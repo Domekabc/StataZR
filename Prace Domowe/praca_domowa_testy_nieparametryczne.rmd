@@ -97,7 +97,7 @@ shapiro.test(zad3$Grade[zad3$Prof == 1])
 shapiro.test(zad3$Grade[zad3$Prof == 2])
 shapiro.test(zad3$Grade[zad3$Prof == 3])
 #testy dla każdego z profesorów to potwierdzają, zatem odpowiednim testem będzie tutaj ANOVA
-
+#zrobić aov
 oneway.test(zad3$Grade ~ zad3$Prof)
 
 vioplot(zad3$Grade ~ zad3$Prof)
